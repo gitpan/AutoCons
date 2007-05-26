@@ -1,0 +1,10 @@
+AutoCons is a cons Construct generator similar to ExtUtils::MakeMaker or Gnu 
+Autoconf, except that cons is far more portable than make. For the 
+developer, this means that your program will build on any system that cons 
+will. For a user, this means that you don't need a "make" program to build 
+your program.
+
+Like cons itself, AutoCons 'Construct.PL's are just Perl scripts. This 
+way, you can do almost anything with them, yet if nothing special is 
+required, it is simple and easy to understand. AutoCons will also run any 
+other '.PL' files, making recursive builds easy to implement.

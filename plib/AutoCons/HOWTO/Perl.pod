@@ -1,0 +1,51 @@
+=head1 NAME
+
+AutoCons::HOWTO::Perl - HOWTO write a Construct.PL for a Perl program
+
+=head1 DESCRIPTION
+
+AutoCons is a cons Construct generator similar to ExtUtils::MakeMaker or
+Gnu Autoconf, except that cons is far more portable than make. For the
+developer, this means that your program will build on any system that cons
+will. For a user, this means that you don't need a "make" program to build
+your program.
+
+This HOWTO describes how to write F<Construct.PL>s to build Perl programs.
+
+=head1 Install
+
+Modules are installed with a simple group of commands.
+
+ perl Construct.PL
+ cons
+ cons t
+ su -c "cons <prefix>"
+
+Where <prefix> is where Perl is installed. Usually it's F</usr> on UNIX like systems and F<C:\Program Files> on 
+Windows ones.
+
+=head1 Layout
+
+The basic file layout looks like this. You might compare it to 
+ExtUtils::MakeMaker's layout, but it is far more generic.
+
+ ./Construct.PL # You know what that is.
+ ./plib/* # Perl library modules. They will be checked for embedded POD.
+ ./scripts/* # Any Perl scripts.
+ ./t/* # Tests.
+
+The only required file is F<Construct.PL>, but it will just create a bare 
+F<Construct>, since it needs something to build.
+
+=head1 F<Construct.PL>
+
+You should only have to write a basic F<Construct.PL>, since AutoCons will 
+auto-detect all of your module's requirements.
+
+=head1 SEE ALSO
+
+Other HOWTOs:
+L<AutoCons::HOWTO(1)> L<AutoCons::HOWTO::C(1)>
+
+Other:
+L<AutoCons(3)> L<cons(1)> L<perl(1)>

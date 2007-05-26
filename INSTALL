@@ -1,0 +1,5 @@
+Installation is simple. Just run:
+> perl Construct.PL
+> cons
+> su -c "cons /"
+on POSIX systems. If you are on Windows, see INSTALL.Win32.

@@ -1,0 +1,146 @@
+=head1 NAME
+
+AutoCons::HOWTO - How to write a Construct.PL.
+
+=head1 DESCRIPTION
+
+AutoCons is a cons Construct generator similar to ExtUtils::MakeMaker or Gnu Autoconf,
+except that cons is far more portable than make. For the developer, this
+means that your program will build on any system that cons will.
+For a user, this means that you don't need a "make" program to build your program.
+
+This howto tells how to write a Construct.PL.
+
+=head1 Install
+
+Modules are installed with a simple group of commands.
+
+ perl Construct.PL
+ cons
+ cons t
+ su -c "cons <prefix>"
+
+Where <prefix> is where your program will install to. Usually it's F</usr> on UNIX like systems and 
+F<C:\Program Files> on Windows ones.
+
+=head1 ABOUT
+
+=head2 Cons
+
+Cons is a make replacement. From L<cons>:
+
+Cons is a system for constructing, primarily, software, but is quite different from
+previous software construction systems. Cons was designed from the ground up to deal
+easily with the construction of software spread over multiple source directories.
+Cons makes it easy to create build scripts that are simple, understandable and maintainable.
+Cons ensures that complex software is easily and accurately reproducible.
+
+Cons uses a number of techniques to accomplish all of this. Construction scripts are
+just Perl scripts, making them both easy to comprehend and very flexible. Global
+scoping of variables is replaced with an import/export mechanism for sharing information between 
+scripts, significantly improving the readability and maintainability of each script. Construction 
+environments are introduced: these are Perl objects that capture the information required for 
+controlling the build process. Multiple environments are used when different semantics are 
+required for generating products in the build tree. Cons implements automatic dependency analysis 
+and uses this to globally sequence the entire build. Variant builds are easily produced from a 
+single source tree. Intelligent build subsetting is possible, when working on localized changes.
+Overrides can be setup to easily override build instructions without modifying any
+scripts. MD5 cryptographic signatures are associated with derived files, and are used
+to accurately determine whether a given file needs to be rebuilt.
+
+While offering all of the above, and more, Cons remains simple and easy to use.
+
+=head2 AutoCons
+
+AutoCons automatically generates Construction (F(Construct>) files for doing any number of 
+things. Like Cons itself, the F<Construct.PL> (the file AutoCons uses) is just a Perl script. You 
+don't have to be a Perl expert to use AutoCons (you can use it more powerfullyif you are.) Unlike 
+similar projects (MakeMaker and Autoconf/Automake,) AutoCons is capable of auto-detecting quite a 
+few things B<and> is not made specifically for one type of build.
+
+=head1 HOWTO
+
+=head2 Layout
+
+The following directories are recognized by AutoCons
+
+=head2 Generic
+
+ ./man1
+ ./man3
+ ./pod
+ ./bin
+
+=head2 Perl
+
+ ./pscripts
+ ./plib
+
+=head2 C
+
+ ./src
+
+F<./man1> F<./man3>
+
+	preformatted man pages
+
+F<./pod>
+
+	Plain Old Documentation
+
+F<./bin>
+
+	programs or shell scripts; perl scripts should be put in pscripts
+
+F<./pscripts> F<./plib> 
+
+	Perl scripts and modules
+
+F<./src>
+
+	C Source
+
+=head2 A basic F<Construct.PL>
+
+The F<Construct.PL> is (as it's .PL extension suggests) just a Perl script. It loads the AutoCons 
+module and writes the Construct, adding anything necessary for the build and instructing AutoCons 
+to try to auto-detect anything the F<Construct.PL> doesn't know. A simple example would look like 
+this.
+
+ use AutoCons;
+ WriteCS(
+   Name => "Foo",
+   Version => "1.0",
+ );
+
+And the directory layout would look like this.
+
+ ./Construct.PL
+ ./pod/Foo.pod
+
+AutoCons will treat F<Foo.pod> as POD documentation. POD (Portable Os Documentation) is a 
+portable documentation format with a simple syntax. This HOWTO is written in POD, though odds are 
+it was converted to your native doc format.
+
+AutoCons will then write a F<Construct> file that will do all of the jobs necessary to convert 
+PODs and install it. Output should look like this.
+
+ Install pod/Foo.pod as blib/pod/Foo.pod
+ pod2man blib/pod/Foo.pod blib/man1/Foo.1
+
+Then when you install...
+
+Install blib/man1/Foo.1 as /usr/share/man1/Foo.1
+
+=head1 A more advanced Construct.PL
+
+Of course, it is kinda useless only building docs. Building programs is 
+almost as simple, though. That, is another HOWTO.
+
+=head1 SEE ALSO
+
+Next HOWTOs:
+L<AutoCons::HOWTO::C(1)> L<AutoCons::HOWTO::Perl(1)>
+
+Other:
+L<AutoCons(3)> L<cons(1)> L<perl(1)>

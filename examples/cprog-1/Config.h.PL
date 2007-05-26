@@ -1,0 +1,2 @@
+use AutoCons::ConfigH;
+ConfigH();

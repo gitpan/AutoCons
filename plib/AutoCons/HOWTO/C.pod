@@ -1,0 +1,118 @@
+=head1 NAME
+
+AutoCons::HOWTO::C - HOWTO write a Construct.PL for a C program
+
+=head1 DESCRIPTION
+
+AutoCons is a cons Construct generator similar to ExtUtils::MakeMaker or 
+Gnu Autoconf, except that cons is far more portable than make. For the 
+developer, this means that your program will build on any system that cons 
+will. For a user, this means that you don't need a "make" program to build 
+your program.
+
+This HOWTO describes how to write a Construct.PL to build C programs.
+
+=head1 Install
+
+Modules are installed with a simple group of commands.
+
+ perl Construct.PL
+ cons
+ cons t
+ su -c "cons <prefix>"
+
+Where <prefix> is where Your program will install to. Usually it's F</usr> on UNIX like systems and 
+F<C:\Program Files> on Windows ones.
+
+=head1 Adding targets
+
+In order to build a C program, you have to add new targets that match up 
+to your source. For example, to build the simple Hello World!:
+
+ Use AutoCons;
+ WriteCS(
+   Name => "Hello World!",
+   Version => "1",
+ );
+ Targ("Program","blib/hello","hello.c");
+
+"Why is the hello executable stored in F<blib>?" Well, when AutoCons 
+configures the Construct, it sets it up to build the F<blib> directory by 
+default (when the user runs C<cons>.) So by storing the output (hello) in 
+blib, you tell cons to build it by default.
+
+Other types of targets are available too.
+
+ Use AutoCons;
+ WriteCS(
+   Name => "Hello World!",
+   Version => "1",
+ );
+ Targ("Program","blib/bin/hello","[ hello.c, blib/lib/libworld ]");
+ Targ("Library","blib/lib/libworld","libworld.c");
+
+Your program also needs to be installed.
+
+ Use AutoCons;
+ WriteCS(
+   Name => "Hello World!",
+   Version => "1",
+ );
+ Targ("Program","blib/bin/hello","[ hello.c, blib/lib/libworld ]");  
+ Targ("Install","$installbin","blib/bin/hello");
+ Targ("Library","blib/lib/libworld","libworld.c");
+ Targ("Install","$installlib","blib/lib/libworld");
+
+For a full list of target types, see L<cons/Default construction methods>.
+
+=head1 F<Config.h>
+
+It is also possible to find system-dependent information. This is done by 
+creating a F<Config.h.PL>.
+
+This file will load AutoCons::ConfigH as opposed to the regular AutoCons. 
+The F<Config.h> file it generates will contain B<ALL> of the info
+contained in F<Config.pm> (a database of system-dependent information
+packages with perl with over 900 values) as well as any information you 
+add to it. See L<Config> for more info. A basic Config.h.PL would look 
+like this.
+
+ use AutoCons::ConfigH;
+ ConfigH();
+
+=head2 F<Config.t> and F<Config.t.d>
+
+For more elaborate results, use a F<Config.t> or F<Config.t.d>. The 
+Config.t is a script that outputs in TAP format (see 
+L<Test::Harness::TAP> . Here is a dummy written in standard SH.
+
+ #!/bin/bash
+ echo "1..2"
+ echo "ok 1" # Ok
+ #echo "not ok 2" # Error
+
+Adding to the Config.h is done by writing to Config.h.part. Any code added 
+to it will be appended to Config.h. For example
+
+ #!/bin/bash
+ echo "1..2"
+ echo "ok 1" # Ok
+ #echo "not ok 2" # Error
+ echo "blablabla" >>Config.h.part
+
+You can write this in any language (I used shell since almost anyone knows 
+it). 
+
+=head2 Config.t.d
+
+This directory contains F<.t> files. They contain the same syntax that 
+F<Config.t> does, though it is easier to manage multiple files that test 
+multiple features.
+
+=head1 SEE ALSO
+
+Other HOWTOs:
+L<AutoCons::HOWTO(1)> L<AutoCons::HOWTO::Perl(1)>
+
+Other:
+L<AutoCons(3)> L<cons(1)> L<perl(1)>
