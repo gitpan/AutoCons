@@ -17,7 +17,7 @@ developer, this means that your program will build on any system that cons
 will. For a user, this means that you don't need a "make" program to build 
 your program.
 
-AutoCons::Settings contains common information in AutoCons.
+AutoCons::AC contains common information in AutoCons.
 
 =head2 FUNCTIONS
 
@@ -26,6 +26,8 @@ AutoCons::Settings contains common information in AutoCons.
 # Make sure there isn't anything stupid in here, but don't worry about
 # global variables.
 use strict;
+use File::Find;
+use YAML;
 no strict "vars";
 
 $VERSION = 0.01_01;
@@ -37,8 +39,7 @@ $XS_VERSION = $VERSION;
 
 * DirSearch()
 
-Get list of files in a directory (run by WriteCS, mainly for internal 
-use.)
+Get list of files in a directory.
  DirSearch("<DIRECTORY>");
  foreach (@dirs)  {< DO SOMETHING >}
  foreach (@files) {< DO SOMETHING >}
@@ -61,8 +62,7 @@ sub DirSearch {
 
 * DirCleanUp()
 
-Clean up variables set by DirSearch (run by WriteCS, mainly for internal
-use.)
+Clean up variables set by DirSearch.
  DirCleanUp( );
 
 =cut
@@ -77,7 +77,7 @@ sub DirCleanUp {
 
 * Prompt()
 
-Ask the user for input (run by WriteCS, mainly for internal use.)
+Ask the user for input.
  $answ = Prompt("<MESSAGE>");
 
 =cut
@@ -94,16 +94,15 @@ sub Prompt {
 
 * MkDist()
 
-Ask the user for input (run by WriteCS, mainly for internal use.)
- MkDist("<NAME>", "<VER>");
+Ask the user for input.
+ MkDist( );
 
 =cut
 
 sub MkDist {
-  # Get args.
-  my($name, $ver) = @_;
   # Check for "officially supported" distribution makers.
-  if (-f 'Build.PL') {
+  #   Module::Build 'Build.PL'
+  if ((-f 'Build.PL') && (! $nodrive)) {
     if (! -f 'Build') {
       print "$^X Build.PL\n" if ($0 eq "cons");
       system("$^X Build.PL");
@@ -113,8 +112,8 @@ sub MkDist {
     system("$^X Build manifest");
     print "$^X Build dist\n" if ($0 eq "cons");
     system("$^X Build dist");
-    return 1;
-  } elsif (-f "Makefile.PL") {
+  #   Standard ExtUtils::MakeMaker (I don't list this 1st because of Module::Build::Compat.)
+  } elsif ((-f "Makefile.PL") && (! $nodrive)) {
     if (! -f 'Makefile') {
       print "$^X Makefile.PL\n" if ($0 eq "cons");
       system("$^X Makefile.PL");
@@ -122,47 +121,16 @@ sub MkDist {
     &MkMS;
     print "make dist\n" if ($0 eq "cons");
     system("make dist");
-    return 1;
-    # Try to drive Module::Build.
-  } elsif (eval "use Module::Build; 1") {
-    # Search for PMs and PODs.
-    DirSearch("plib");
-    DirSearch("pod");
-    foreach (@dirs) {
-      DirSearch($_);
-    }
-    foreach (@files) {
-      if (/\.pm/) {
-        s/plib/lib/;
-        $pm{"p$_"} = $_;
-      } elsif (/\.pod/) {
-        s/plib/lib/;
-        $pods{"p$_"} = $_;
-      }
-    }
-    # Get info from user.
-    my $name = Prompt("Name?")        unless ($name);
-    my $ver  = Prompt("Version?")     unless ($ver);
-    my $auth = Prompt("Author?")      unless ($auth);
-    my $desc = Prompt("Description?") unless ($disc);
-    my $build = Module::Build->new (
-      module_name => "$name",
-      dist_version => "$ver",
-      dist_author => "$auth",
-      dist_abstract => "$desc",
-      pm_files => {%pm},
-      pod_files => {%pods}
-    );
-    &MkMS;
-    $build->dispatch('manifest');
-    $build->dispatch('dist');
-    return 1;
+  # ...or if there isn't any.
   } else {
-    # All right... I'll do it myself.
-    my $name = Prompt("Name?")        unless ($name);
-    my $ver  = Prompt("Version?")     unless ($ver);
-    my $auth = Prompt("Author?")      unless ($auth);
-    my $desc = Prompt("Description?") unless ($disc);
+    $name = Prompt("Name?")        unless ($name);
+    $ver  = Prompt("Version?")     unless ($ver);
+    $auth = Prompt("Author?")      unless ($auth);
+    $desc = Prompt("Description?") unless ($disc);
+    print "Creating META.yml...\n";
+    open(MYML,">META.yml");
+    print MYML
+    Dump({"meta-spec" => {"version" => "1.3", "url" => "http://module-build.sourceforge.net/META-spec-v1.3.html"}, "name" => $name,"version" => $ver, "abstract" => $desc, "author" => $auth, "license" => "unknown", "generated_by" => "AutoCons version $VERSION"});
     if (! -f "MANIFEST") {
       if (! -f "MANIFEST.SKIP") {
         &MkMS;
@@ -172,23 +140,38 @@ sub MkDist {
       mkmanifest();
     }
     print "Creating $name-$ver.tar.gz...\n";
-    open(MANIFEST, "MANIFEST");
-    while (<MANIFEST>) {
-      if (/^([^\s]+)\s(.+)/) {
-        push @files, $1;
-      } else {
-        chomp $_;
-        push @files, $_;
-      }
-    }
-    use Archive::Tar;
-    Archive::Tar->create_archive("$name-$ver.tar.gz", 1, @files);
-    return 1;
+    use ExtUtils::Manifest qw(maniread manicopy);
+    manicopy( maniread(), "$name-$ver" );
+    make_tarball("$name-$ver");
   }
-  # Cleanup
-  unlink "$name-$ver.tar.gz" if (-f "$name-$ver.tar.gz");
-  unlink "Build" if (-f "Build");
-  unlink "Makefile" if (-f "Makefile");
+  1;
+}
+
+sub make_tarball {
+  my ($dir, $file) = @_;
+  $file ||= $dir;
+
+  use Archive::Tar;
+  # Archive::Tar versions >= 1.09 use the following to enable a compatibility
+  # hack so that the resulting archive is compatible with older clients.
+  $Archive::Tar::DO_NOT_USE_PREFIX = 0;
+  my $files = rscan_dir($dir);
+  print "[TAR] $file.tar.gz\n" if ($0 eq "cons");
+  Archive::Tar->create_archive("$file.tar.gz", 1, @$files);
+}
+
+sub rscan_dir {
+  my ($dir, $pattern) = @_;
+  my @result;
+  use File::Find;
+  local $_; # find() can overwrite $_, so protect ourselves
+  my $subr = !$pattern ? sub {push @result, $File::Find::name} :
+             !ref($pattern) || (ref $pattern eq 'Regexp') ? sub {push @result, $File::Find::name if /$pattern/} :
+             ref($pattern) eq 'CODE' ? sub {push @result, $File::Find::name if $pattern->()} :
+             die "Unknown pattern type";
+
+  File::Find::find({wanted => $subr, no_chdir => 1}, $dir);
+  return \@result;
 }
 
 =pod
@@ -238,10 +221,11 @@ sub MkMS {
 \B\._
 # Avoid archives of this distribution
 \b-[\d\.\_]+  
-# Don\'t add AutoCons files.
+# Avoid cons/AutoCons files.
 \.consign$ 
-Construct$
-';
+\bConstruct$
+
+'; close(MS);
 }
 
 =pod

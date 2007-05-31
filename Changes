@@ -1,0 +1,23 @@
+-- AutoCons 0.01_02
+  * Fixed bugs in tests.
+    - t/Construct renamed to t/test.cs so that it isn't skipped in distribution.
+  * Fixed bugs in dist target.
+    - Asks stupid ?'s
+    - Flattened tar
+  * Added new features to dist target.
+    - META.yml
+    - Optionally use 'official' distribution builders
+    - Preset answers
+  * Added command-line options: perl Construct.PL key1=value1 key2=value2...
+    - name {string}
+    - ver {string}
+    - desc {string} (Description)
+    - auth {string} (Author)
+    - install_ {string} [man1 man3 lib bin arch]
+    - type {string} 
+    - nodrive {booline} (don't 'drive' other dist builders)
+  * Added Build.PL and Makefile.PL.
+  * Added this Changes log.
+
+-- AutoCons 0.01_01
+INITIAL RELEASE

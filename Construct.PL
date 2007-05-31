@@ -30,11 +30,13 @@ unless ($cons) {
 # Write Construct.PL.
 WriteCS(
   Name => "AutoCons",
-  Version => "0.01_01",
+  Version => "0.01_02",
   NoRec => 1, # Don't build examples.
   PreReqs => [
     "strict",
     "Config",
-    "Test::Harness 2"
+    "Test::Harness 2",
+    "ExtUtils::Manifest",
+    "File::Find"
   ]
 );
