@@ -1,0 +1,47 @@
+$Id: INSTALL,v 1.9 2000/06/06 20:58:42 rv Exp $
+
+This cons distribution contains the following files:
+
+CHANGES		- Change log for cons.
+COPYING		- The GNU General Public License under which cons is released.
+INSTALL		- This file.
+README		- Explanation of software.
+RELEASE		- Release Notes for current distribution.
+TODO		- The list of things to do with cons.
+cons		- The cons program
+cons.1		- A nroff-formatted manual page documentation of cons.
+cons.bat	- cons as an MS-DOS batch file.
+cons.html	- HTML formatted cons documentation.
+test.*.log	- Log file(s) from regression tests of cons with various
+		  versions of Perl.
+
+This distribution may optionally contain a test/ subdirectory containing
+the regression test suite for cons.  See test/README for details about
+its contents.
+
+To use cons, simply copy the `cons' program to a location where you keep
+other executable binaries or scripts, like /usr/local/bin.
+
+Win-NT users can execute the cons program in 2 ways:
+
+       1. Rename it to cons.pl and associate the .pl suffix with perl so
+	  that Windows will always execute the program inside perl.
+       2. Run cons.bat.  Make sure that perl is in your
+	  path when use do this.
+
+There are a lot of ways of getting cons documentation. Listed here are a
+few:
+
+1. Users may generate various types of documentation with the cons program
+itself using the pod2* utilities available with the perl distribution.
+
+2. Another way is to use perldoc. perldoc /path/to/cons will generate a
+manpage-like formatted output.
+
+3. Alternately, users can use the man page cons.1 supplied with this
+distribution and move it to a location in your manpath
+(e.g. /usr/local/man/man1) and use the UNIX man command (man cons) to view
+cons documentation.
+
+4. Or, users can use the html page cons.html supplied with this distribution
+and view it through a browser.

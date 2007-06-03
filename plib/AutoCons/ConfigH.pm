@@ -112,13 +112,13 @@ sub ConfigH {
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995 Michael Howell. All rights reserved.              
+Copyright (c) 2007 Michael Howell. All rights reserved.              
 This program is free software; you can redistribute it and/or        
 modify it under the same terms as Perl itself.                
 
 =head1 SEE ALSO
 
-L<AutoCons::HOWTO::C(3)> L<AutoCons(3)>
+L<AutoCons::HOWTO::C(1)> L<AutoCons(3)>
 
 L<cons(1)> L<perl(1)>
 

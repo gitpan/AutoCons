@@ -12,17 +12,14 @@ your program.
 
 This HOWTO describes how to write F<Construct.PL>s to build Perl programs.
 
-=head1 Install
+=head1 INSTALL
 
 Modules are installed with a simple group of commands.
 
  perl Construct.PL
  cons
- cons t
- su -c "cons <prefix>"
-
-Where <prefix> is where Perl is installed. Usually it's F</usr> on UNIX like systems and F<C:\Program Files> on 
-Windows ones.
+ cons -- test
+ cons -- install
 
 =head1 Layout
 

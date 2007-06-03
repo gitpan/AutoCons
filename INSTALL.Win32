@@ -1,4 +1,5 @@
 Installation is simple. Just run:
 > perl Construct.PL
 > cons
-> cons C:\
+> cons -- test
+> cons -- install

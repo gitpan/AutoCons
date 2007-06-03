@@ -11,17 +11,14 @@ For a user, this means that you don't need a "make" program to build your progra
 
 This howto tells how to write a Construct.PL.
 
-=head1 Install
+=head1 INSTALL
 
 Modules are installed with a simple group of commands.
 
  perl Construct.PL
  cons
- cons t
- su -c "cons <prefix>"
-
-Where <prefix> is where your program will install to. Usually it's F</usr> on UNIX like systems and 
-F<C:\Program Files> on Windows ones.
+ cons -- test
+ cons -- install
 
 =head1 ABOUT
 

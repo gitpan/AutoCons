@@ -1,5 +1,6 @@
 Installation is simple. Just run:
 > perl Construct.PL
 > cons
-> su -c "cons /"
+> cons -- test
+> su -c "cons -- install"
 on POSIX systems. If you are on Windows, see INSTALL.Win32.

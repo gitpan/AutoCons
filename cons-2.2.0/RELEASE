@@ -1,0 +1,45 @@
+$Id: RELEASE,v 1.21.2.1 2000/11/17 05:39:08 knight Exp $
+
+Cons 2.2.0
+**********
+
+This release is a stable release of Cons.  It contains all the changes
+from the 2.1 development branch, including many changes developed on
+that branch after the release of 2.1.2.
+
+Visible changes include:
+
+    --	Cons will now use the Digest::MD5 module in preference to the
+    	older, deprecated MD5 module.  The MD5 module will be used if
+	Digest::MD5 is not installed.
+
+    --	When using the -t option, Cons now prints a message about its
+    	internal directory-change to the top-level directory.  This
+	allows emacs to be aware of the directory to which path names
+	in build output are relative.
+
+    --	The QuickScan method on Windows NT now uses ';' instead of
+	':' as the PATH separator.  An array ref may also be used.
+
+    --	The Depends and SourcePath methods can now cope with an
+    	array of targets.
+
+This release contains many other fixes and less-visible changes.  See the
+CHANGES file for details.
+
+General
+*******
+
+Thanks to Marconi Communications (formerly FORE Systems) management for
+having transferred the copyright to the Free Software Foundation and for
+previously having released `cons' under the GNU General Public License
+(GPL) so that everyone can benefit from it.
+
+Thanks to the Free Software Foundation for the infrastructure support for
+cons.
+
+And thanks to the members of the Cons community for the bug reports,
+patches, discussion, and continued interest.
+
+Steven Knight - Development Release Co-ordinator
+Rajesh Vaidheeswarran - Maintainer

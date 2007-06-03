@@ -1,0 +1,34 @@
+$Id: README,v 1.10 2000/09/21 03:16:53 knight Exp $
+
+Cons is a Perl-based make replacement.  It is not compatible with make,
+but has a number of powerful capabilities not found in other software
+construction systems, including make.
+
+This package contains a development release of Cons and its documentation.
+Development releases are intended for advanced features and quick delivery
+of bug fixes.  If you are looking for the latest stable release, look
+for an even-digit minor version number (2.0.x, 2.2.x, etc.).
+
+A related package (cons-test) contains a portable test suite for Cons,
+plus a wrapper script and supporting modules for executing the tests.
+You do not need this other package to use Cons.
+
+You will need Perl 5.002 or better and the Perl Digest::MD5 module,
+available from CPAN.
+
+Cons is known to work on a variety of platforms: it's in production
+use on versions of FreeBSD, Linux, SunOS, Solaris, HPUX, AIX, IRIX and
+Windows NT.
+
+Documentation is supplied in POD format (thanks to Ulrich Pfeifer).
+
+A cons discussion group, cons-discuss@gnu.org, has been created.  If
+you wish to subscribe, send mail to cons-discuss-request@gnu.org with
+the word "subscribe" in the BODY of the message. Please send all comments,
+requests, complaints, etc. to the mailing list.
+
+Cons is maintained by members of the cons-discuss mailing list.
+
+The official cons web site is http://www.dsmit.com/cons
+
+An article about Cons appeared in The Perl Journal, issue #9, Spring 1998.

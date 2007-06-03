@@ -1,3 +1,16 @@
+-- AutoCons 0.01_03
+  * Now packaged with CONS, since we can't grab it through CPAN.pm or 
+    assume the user has it.
+  * Fixed directory structure for Perl scripts.
+  * Fixed tests (they now work with Module::Build.)
+  * Updated documentation.
+  * Fixed COPYRIGHT is docs. OOPS!! I copied from a 1995 template :(
+  * No longer requires YAML or Archive::Tar unless you are making a 
+    package.
+  * Supports /bin/tar instead of Archive::Tar, if you have /bin/tar. It'll 
+    still use if you don't have /bin/tar.
+  * 'cons -- test' works without a t/ directory.
+
 -- AutoCons 0.01_02
   * Fixed bugs in tests.
     - t/Construct renamed to t/test.cs so that it isn't skipped in distribution.

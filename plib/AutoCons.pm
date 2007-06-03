@@ -307,7 +307,7 @@ sub Vars {
     $installprefix);
 END
   print CS "} elsif (\$ARGV[0] eq \"test\") {\n";   
-  print CS "  Default \'t\'\n;";
+  print CS "  Default \'t\'\n if (-d \"t\");";
   print CS "} else {\n";
   print CS "  Default \'blib\';\n";
   print CS "}\n";
@@ -358,9 +358,9 @@ sub Targs {
     &BinTargs;
   }
   &DirCleanUp;
-  if (-d "scripts") {  
+  if (-d "pscripts") {  
     print CS "# Script targets.\n";
-    &ScriptTargs;
+    &PScriptTargs;
   }
   &DirCleanUp;
   print CS "# Documentation targets.\n";
@@ -428,14 +428,17 @@ sub BinTargs {
     &DirSearch("$_");
   }
   foreach my $file (@files) {
-    print CS "InstallAs \$env \"blib/$file\", \"$file\";\n";
-    print CS "Install \$env \"\$installbin\", \"blib/$file\";\n";
+    next if ($file =~ /\.consign$/);
+    print CS "Cp \$env \"blib/$file\", \"$file\";\n";
+    $instfile = $file;
+    $instfile =~ s/bin\///;
+    print CS "InstallAs \$env \"\$installbin/$instfile\", \"blib/$file\";\n";
+    push @ppods,"$file";
   }
 }
-
 =pod
 
-* ScriptTargs()
+* PScriptTargs()
 
 Add perl script targets to Conscript (run by WriteCS, mainly for internal use.)
  ScriptTargs( );
@@ -448,8 +451,11 @@ sub PScriptTargs {
     &DirSearch("$_");
   }
   foreach my $file (@files) {
-    print CS "InstallAs \$env \"blib/$file\", \"$file\";\n";
-    print CS "Install \$env \"\$installbin\", \"blib/$file\";\n";
+    next if ($file =~ /\.consign$/);
+    print CS "Cp \$env \"blib/$file\", \"$file\";\n";
+    $instfile = $file;
+    $instfile =~ s/pscripts\///;
+    print CS "InstallAs \$env \"\$installbin/$instfile\", \"blib/$file\";\n";
     push @ppods,"$file";
   }
 }
@@ -475,7 +481,7 @@ sub DocTargs {
       &DirSearch("$_");
     }
     foreach my $file (@files) {
-      print CS "InstallAs \$env \"blib/$file\", \"$file\";\n";
+      print CS "Cp \$env \"blib/$file\", \"$file\";\n";
       if ($file =~ /(.+)\/(.+)/) {
         print CS "InstallAs \$env \"\$install$1/$2\", \"$file\";\n";
       }
@@ -511,7 +517,7 @@ sub DocTargs {
       $doc =~ s/plib\///;
       $doc =~ s/pod\///;
       $doc =~ s/lib\///;
-      $doc =~ s/scripts\///;
+      $doc =~ s/pscripts\///;
       # Extensions.
       $doc =~ s/\.pod//;
       $doc =~ s/\.pm//;
@@ -544,13 +550,13 @@ sub DocTargs {
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995 Michael Howell. All rights reserved.
+Copyright (c) 2007 Michael Howell. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<AutoCons::HOWTO::C(1)> L<AutoCons::HOWTO::C(1)> L<AutoCons::ConfigH(3)>
+L<AutoCons::HOWTO::C(1)> L<AutoCons::HOWTO::Perl(1)> L<AutoCons::HOWTO(1)> L<AutoCons::ConfigH(3)>
 
 L<cons(1)> L<perl(1)>
 

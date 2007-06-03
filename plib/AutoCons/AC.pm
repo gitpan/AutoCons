@@ -27,10 +27,10 @@ AutoCons::AC contains common information in AutoCons.
 # global variables.
 use strict;
 use File::Find;
-use YAML;
+if (eval "require YAML") { require YAML; }
 no strict "vars";
 
-$VERSION = 0.01_01;
+$VERSION = 0.01_03;
 $XS_VERSION = $VERSION;
 
 # List files if a directory.
@@ -123,14 +123,19 @@ sub MkDist {
     system("make dist");
   # ...or if there isn't any.
   } else {
+    # We need these to build a dist package.
+    # We don't set them as needed since they aren't needed otherwise.
     $name = Prompt("Name?")        unless ($name);
     $ver  = Prompt("Version?")     unless ($ver);
     $auth = Prompt("Author?")      unless ($auth);
     $desc = Prompt("Description?") unless ($disc);
-    print "Creating META.yml...\n";
-    open(MYML,">META.yml");
-    print MYML
-    Dump({"meta-spec" => {"version" => "1.3", "url" => "http://module-build.sourceforge.net/META-spec-v1.3.html"}, "name" => $name,"version" => $ver, "abstract" => $desc, "author" => $auth, "license" => "unknown", "generated_by" => "AutoCons version $VERSION"});
+    if (eval "require YAML") {
+      print "Creating META.yml...\n";
+      open(MYML,">META.yml");
+      print MYML
+      YAML::Dump({"meta-spec" => {"version" => "1.3", "url" => 
+"http://module-build.sourceforge.net/META-spec-v1.3.html"}, "name" => $name,"version" => $ver, "abstract" => $desc, "author" => $auth, "license" => "unknown", "generated_by" => "AutoCons version $VERSION"});
+    }
     if (! -f "MANIFEST") {
       if (! -f "MANIFEST.SKIP") {
         &MkMS;
@@ -150,14 +155,22 @@ sub MkDist {
 sub make_tarball {
   my ($dir, $file) = @_;
   $file ||= $dir;
-
-  use Archive::Tar;
-  # Archive::Tar versions >= 1.09 use the following to enable a compatibility
-  # hack so that the resulting archive is compatible with older clients.
-  $Archive::Tar::DO_NOT_USE_PREFIX = 0;
-  my $files = rscan_dir($dir);
-  print "[TAR] $file.tar.gz\n" if ($0 eq "cons");
-  Archive::Tar->create_archive("$file.tar.gz", 1, @$files);
+  if (-x "/bin/tar") {
+    print "tar -cvf $file.tar $dir\n" if ($0 eq "cons");
+    system("tar -cvf $file.tar $dir");
+    print "gzip $file.tar\n" if ($0 eq "cons");
+    system("gzip $file.tar");
+  } else {
+    unless (eval "require Archive::Tar") { 
+        die "We need Archive::Tar to build a dist.";
+    }
+    # Archive::Tar versions >= 1.09 use the following to enable a compatibility
+    # hack so that the resulting archive is compatible with older clients.
+    $Archive::Tar::DO_NOT_USE_PREFIX = 0;
+    my $files = rscan_dir($dir);
+    print "[TAR] $file.tar.gz\n" if ($0 eq "cons");
+    Archive::Tar->create_archive("$file.tar.gz", 1, @$files);
+  }
 }
 
 sub rscan_dir {
@@ -278,13 +291,14 @@ sub cons::Pod2Man {
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995 Michael Howell. All rights reserved.                         
+Copyright (c) 2007 Michael Howell. All rights reserved.                         
 This program is free software; you can redistribute it and/or             
 modify it under the same terms as Perl itself.                
 
 =head1 SEE ALSO
 
-L<AutoCons::HOWTO::C(3)> L<AutoCons::HOWTO::Perl(3)> L<AutoCons(3)>
+L<AutoCons::HOWTO::C(1)> L<AutoCons::HOWTO::Perl(1)> 
+L<AutoCons::HOWTO(1)> L<AutoCons(3)>
 
 L<cons(1)> L<perl(1)>
 

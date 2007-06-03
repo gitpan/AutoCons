@@ -1,6 +1,18 @@
 .consign
 Build.PL
 Changes
+cons-2.2.0/CHANGES
+cons-2.2.0/cons
+cons-2.2.0/cons.1.gz
+cons-2.2.0/cons.bat
+cons-2.2.0/cons.html
+cons-2.2.0/COPYING
+cons-2.2.0/COPYRIGHT
+cons-2.2.0/INSTALL
+cons-2.2.0/MANIFEST
+cons-2.2.0/README
+cons-2.2.0/RELEASE
+cons-2.2.0/TODO
 Construct.PL
 examples/cprog-1/.consign
 examples/cprog-1/Config.h.PL
@@ -20,6 +32,7 @@ INSTALL.Win32
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+plib/.AutoCons.pm.swp
 plib/.consign
 plib/AutoCons.pm
 plib/AutoCons/.consign
