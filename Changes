@@ -1,3 +1,6 @@
+-- AutoCons 0.01_04
+  * Build.PL and Makefile.PL will now also install CONS.
+  * Separated all kinds of code.
 -- AutoCons 0.01_03
   * Now packaged with CONS, since we can't grab it through CPAN.pm or 
     assume the user has it.

@@ -24,13 +24,14 @@ unless ($cons) {
     File::Copy::syscopy("cons-2.2.0/cons", "pscripts/cons") 
       || die "Cannot prepare Cons sources: $!";
     chmod 0755, "pscripts/cons";
+    push @main::scripts, "pscripts/cons"
   }
 }
 
 use Module::Build;
 my $build = Module::Build->new(
   module_name => 'AutoCons',
-  dist_version => 0.01_03,
+  dist_version => 0.01_04,
   dist_abstract => "a cons-based build system",
   dist_author => "Michael Howell <m_howell123\@yahoo.com>",
   license  => 'perl',
@@ -48,7 +49,8 @@ my $build = Module::Build->new(
     'plib/AutoCons/HOWTO.pod' => 'lib/AutoCons/HOWTO.pod',
     'plib/AutoCons/HOWTO/C.pod' => 'lib/AutoCons/HOWTO/C.pod',
     'plib/AutoCons/HOWTO/Perl.pod' => 'lib/AutoCons/HOWTO/Perl.pod'
-  }
+  },
+  script_files => @main::scripts
 );
 $build->create_build_script;
 

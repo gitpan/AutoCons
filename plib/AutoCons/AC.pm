@@ -130,34 +130,50 @@ sub MkDist {
     $auth = Prompt("Author?")      unless ($auth);
     $desc = Prompt("Description?") unless ($disc);
     if (eval "require YAML") {
-      print "Creating META.yml...\n";
-      open(MYML,">META.yml");
-      print MYML
-      YAML::Dump({"meta-spec" => {"version" => "1.3", "url" => 
-"http://module-build.sourceforge.net/META-spec-v1.3.html"}, "name" => $name,"version" => $ver, "abstract" => $desc, "author" => $auth, "license" => "unknown", "generated_by" => "AutoCons version $VERSION"});
+      &MYml;
     }
-    if (! -f "MANIFEST") {
-      if (! -f "MANIFEST.SKIP") {
-        &MkMS;
-      }
-      print "Writing MANIFEST...\n";
-      use ExtUtils::Manifest qw(mkmanifest);
-      mkmanifest();
-    }
-    print "Creating $name-$ver.tar.gz...\n";
-    use ExtUtils::Manifest qw(maniread manicopy);
-    manicopy( maniread(), "$name-$ver" );
-    make_tarball("$name-$ver");
+    my $manifest = &MkM;
+    manicopy($manifest,"$name-$ver");
+    &make_tarball("$name-$ver", "dist/$name-$ver");
   }
   1;
+}
+
+sub MkM {
+  &MkMS;
+  print "Writing MANIFEST...\n";
+  use ExtUtils::Manifest qw(mkmanifest maniread manicopy);
+  undef $ExtUtils::Manifest::Verbose;
+  &mkmanifest();
+  my $manifest = maniread();
+  return $manifest;
+}
+sub MYml {
+  if (eval "require YAML") {
+    print "Creating META.yml...\n";
+    open(MYML,">META.yml");
+    print MYML
+    YAML::Dump({
+      "meta-spec" => {
+        "version" => "1.3", 
+        "url" => "http://module-build.sourceforge.net/META-spec-v1.3.html"
+      },
+      "name" => $name,"version" => $ver,
+      "abstract" => $desc, "author" => $auth, 
+      "license" => "unknown", 
+      "generated_by" => "AutoCons version $VERSION"
+    });
+  } else {
+    die "Can't find YAML.pm. You need it to write a META.yml";
+  }
 }
 
 sub make_tarball {
   my ($dir, $file) = @_;
   $file ||= $dir;
   if (-x "/bin/tar") {
-    print "tar -cvf $file.tar $dir\n" if ($0 eq "cons");
-    system("tar -cvf $file.tar $dir");
+    print "tar -cf $file.tar $dir\n" if ($0 eq "cons");
+    system("tar -cf $file.tar $dir");
     print "gzip $file.tar\n" if ($0 eq "cons");
     system("gzip $file.tar");
   } else {

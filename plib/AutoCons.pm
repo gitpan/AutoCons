@@ -367,17 +367,12 @@ sub Targs {
   &DocTargs;
   &DirCleanUp;
   # Dist targets.
-  print CS "Cp \$env \"dist/\$name-\$ver.tar.gz\", \"\$name-\$ver.tar.gz\" unless (-f \"dist/\$name-\$ver.tar.gz\");\n";
-  print CS "Command \$env \"\$name-\$ver.tar.gz\", \"$cs\", \'[perl] MkDist()\';\n";
+  print CS "# Distribution packaging.\n";
+  print CS "Command \$env \"dist/\$name-\$ver.tar.gz\", \"$cs\", \'[perl] MkDist()\'
+  unless (-f \"dist/\$name-\$ver.tar.gz\");\n";
   # Test targets.
   if (-d "t") {
-    &DirSearch("t");
-    foreach (@files) {
-      next if ($_ !~ /^(.+)\.t$/);
-      print CS "# Test targets.
-Command \$env \"$_.tested\", \"$_\",\"@ [perl] require Test::Harness;Test::Harness::runtests(\\\"$_\\\")
-@ touch $_.tested\";\n";
-    }
+    &TestTargs();
   }
   if (-f "Config.h") {
     open (CH, "Config.h");
@@ -386,6 +381,25 @@ Command \$env \"$_.tested\", \"$_\",\"@ [perl] require Test::Harness;Test::Harne
       print CS "# Regenerate Config.h.\n";
       print CS "Command \$env \"Config.h\", \"$1\", \"$^X $1\";\n";
     }
+  }
+}
+
+=pod
+
+* TestTargs()
+
+Add targets for testing.
+ TestTargs( )
+
+=cut
+
+sub TestTargs {
+  &DirSearch("t");
+  foreach (@files) {
+    next if ($_ !~ /^(.+)\.t$/);
+    print CS "# Test targets.
+Command \$env \"$_.tested\", \"$_\",\"@ [perl] require Test::Harness;Test::Harness::runtests(\\\"$_\\\")
+@ touch $_.tested\";\n";
   }
 }
 

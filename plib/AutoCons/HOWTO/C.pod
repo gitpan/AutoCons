@@ -77,35 +77,6 @@ like this.
  use AutoCons::ConfigH;
  ConfigH();
 
-=head2 F<Config.t> and F<Config.t.d>
-
-For more elaborate results, use a F<Config.t> or F<Config.t.d>. The 
-Config.t is a script that outputs in TAP format (see 
-L<Test::Harness::TAP> . Here is a dummy written in standard SH.
-
- #!/bin/bash
- echo "1..2"
- echo "ok 1" # Ok
- #echo "not ok 2" # Error
-
-Adding to the Config.h is done by writing to Config.h.part. Any code added 
-to it will be appended to Config.h. For example
-
- #!/bin/bash
- echo "1..2"
- echo "ok 1" # Ok
- #echo "not ok 2" # Error
- echo "blablabla" >>Config.h.part
-
-You can write this in any language (I used shell since almost anyone knows 
-it). 
-
-=head2 Config.t.d
-
-This directory contains F<.t> files. They contain the same syntax that 
-F<Config.t> does, though it is easier to manage multiple files that test 
-multiple features.
-
 =head1 SEE ALSO
 
 Other HOWTOs:

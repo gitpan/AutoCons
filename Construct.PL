@@ -35,7 +35,7 @@ unless ($cons) {
 # Write Construct.PL.
 WriteCS(
   Name => "AutoCons",
-  Version => "0.01_03",
+  Version => "0.01_04",
   NoRec => 1, # Don't build examples.
   PreReqs => [
     "strict",
