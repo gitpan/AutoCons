@@ -1,3 +1,7 @@
+-- AutoCons 0.01_05
+  * More efficient testing.
+  * Prints the actual commands.
+  * Basic XS support.
 -- AutoCons 0.01_04
   * Build.PL and Makefile.PL will now also install CONS.
   * Separated all kinds of code.
@@ -29,7 +33,7 @@
     - ver {string}
     - desc {string} (Description)
     - auth {string} (Author)
-    - install_ {string} [man1 man3 lib bin arch]
+    - install[string] {string} [man1 man3 lib bin arch]
     - type {string} 
     - nodrive {booline} (don't 'drive' other dist builders)
   * Added Build.PL and Makefile.PL.

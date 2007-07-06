@@ -3,4 +3,5 @@ Installation is simple. Just run:
 > cons
 > cons -- test
 > su -c "cons -- install"
-on POSIX systems. If you are on Windows, see INSTALL.Win32.
+on POSIX systems. If you are on Windows, see INSTALL.Win32. If you don't have cons, 
+the installer should see that and put a 'cons' script in pscripts. Use that.

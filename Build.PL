@@ -31,7 +31,7 @@ unless ($cons) {
 use Module::Build;
 my $build = Module::Build->new(
   module_name => 'AutoCons',
-  dist_version => 0.01_04,
+  dist_version => 0.01_05,
   dist_abstract => "a cons-based build system",
   dist_author => "Michael Howell <m_howell123\@yahoo.com>",
   license  => 'perl',

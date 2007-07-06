@@ -16,7 +16,6 @@ cons-2.2.0/TODO
 Construct.PL
 examples/cprog-1/.consign
 examples/cprog-1/Config.h.PL
-examples/cprog-1/Config.t.d/foo.t
 examples/cprog-1/Construct.PL
 examples/cprog-1/README
 examples/cprog-1/src/bin/.consign
@@ -28,7 +27,6 @@ examples/Perl::Module/plib/Perl/Module.pm
 examples/Perl::Module/plib/Perl/Module2.pm
 examples/Perl::Module/README
 INSTALL
-INSTALL.Win32
 Makefile.PL
 MANIFEST			This list of files
 META.yml

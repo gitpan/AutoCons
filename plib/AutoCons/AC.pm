@@ -30,7 +30,7 @@ use File::Find;
 if (eval "require YAML") { require YAML; }
 no strict "vars";
 
-$VERSION = 0.01_03;
+$VERSION = 0.01_05;
 $XS_VERSION = $VERSION;
 
 # List files if a directory.
@@ -277,7 +277,7 @@ Copy a file.
 sub cons::Cp {
   my ($env, $dst, $src) = @_;
   Command $env $dst, $src, qq(
-    @ echo "[CP] $dst"
+    @ echo "cp $src $dst"
     @ [perl] futil::copy("$src","$dst")
   );
 }
@@ -298,8 +298,7 @@ sub cons::Pod2Man {
     $manname = uc($src);
   }
   Command $env $dst, $src, qq(
-    @ echo "[MAN] $manname"
-    @ pod2man --name=$manname %< %>
+    pod2man --name=$manname $src $dst
   );
 }
 

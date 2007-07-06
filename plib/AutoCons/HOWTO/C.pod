@@ -70,12 +70,40 @@ creating a F<Config.h.PL>.
 This file will load AutoCons::ConfigH as opposed to the regular AutoCons. 
 The F<Config.h> file it generates will contain B<ALL> of the info
 contained in F<Config.pm> (a database of system-dependent information
-packages with perl with over 900 values) as well as any information you 
+from perl with over 900 values) as well as any information you 
 add to it. See L<Config> for more info. A basic Config.h.PL would look 
 like this.
 
  use AutoCons::ConfigH;
  ConfigH();
+
+A more advanced one like this.
+
+ use AutoCons::ConfigH;
+ open(KDE, "kde-config --prefix|");
+ my $kde    =<KDE>;
+ my $kdelibs="$kde/lib";
+ my $kdebin ="$kde/bin";
+ ConfigH("
+   \#define KDE $kde
+   \#define KDELIBS $kdelibs
+   \#define KDEBIN $kdebin
+ ");
+
+I'll explain it bit-by-bit.
+
+ open(KDE, "kde-config --prefix|");
+
+This runs C<kde-config> and gathers it's output as a filehandle (C<KDE>).
+
+ my $kde = <KDE>;
+
+...sets $kde to the first line of C<KDE>.
+
+ my $kdelibs = "$kde/lib";
+ my $kdebin  = "$kde/bin";
+
+It assumes you are using a *nix.
 
 =head1 SEE ALSO
 
@@ -84,3 +112,4 @@ L<AutoCons::HOWTO(1)> L<AutoCons::HOWTO::Perl(1)>
 
 Other:
 L<AutoCons(3)> L<cons(1)> L<perl(1)>
+
