@@ -1,7 +1,13 @@
+-- AutoCons 0.01_06
+  * Inline support.
+  * XS now works.
+  * Upgraded C HOWTO.
+  * Added Library support.
+  * Tests examples.
 -- AutoCons 0.01_05
   * More efficient testing.
   * Prints the actual commands.
-  * Basic XS support.
+  * XS support.
 -- AutoCons 0.01_04
   * Build.PL and Makefile.PL will now also install CONS.
   * Separated all kinds of code.

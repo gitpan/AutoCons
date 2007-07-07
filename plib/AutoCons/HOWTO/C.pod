@@ -80,30 +80,40 @@ like this.
 A more advanced one like this.
 
  use AutoCons::ConfigH;
- open(KDE, "kde-config --prefix|");
- my $kde    =<KDE>;
- my $kdelibs="$kde/lib";
- my $kdebin ="$kde/bin";
+ use ExtUtils::PkgConfig;
+ %pkg_info = ExtUtils::PkgConfig->find (Gtk+);
+ 
  ConfigH("
-   \#define KDE $kde
-   \#define KDELIBS $kdelibs
-   \#define KDEBIN $kdebin
+   #define Gtklibs $pkg_info{libs}
+   #define Gtkflags $pkg_info{cflags}
+   #define Gtkver $pkg_info{modversion}
  ");
 
 I'll explain it bit-by-bit.
 
- open(KDE, "kde-config --prefix|");
+ use ExtUtils::PkgConfig
 
-This runs C<kde-config> and gathers it's output as a filehandle (C<KDE>).
+ExtUtils::PkgConfig is a wrapper around pkg-config that makes it easy to use.
 
- my $kde = <KDE>;
+ %pkg_info = ExtUtils::PkgConfig->find (Gtk+);
 
-...sets $kde to the first line of C<KDE>.
+...grabs info about Gtk+ and stores it.
 
- my $kdelibs = "$kde/lib";
- my $kdebin  = "$kde/bin";
+ #define ... $pkg_info{...}
 
-It assumes you are using a *nix.
+...uses that info.
+
+You probably also want to link against your library.
+
+ # Construct.PL
+ use AutoCons;
+ use ExtUtils::PkgConfig;
+ %Gtk = ExtUtils::PkgConfig->find (gtk+);
+ WriteCS(
+   Name => "foo",
+   Version => 1,
+   Libs => $Gtk{libs}
+ );
 
 =head1 SEE ALSO
 

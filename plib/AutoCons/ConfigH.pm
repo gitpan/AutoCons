@@ -53,9 +53,6 @@ no strict "vars";
 # Load in what I need.
 use Config;
 # In case we are under a 'boxed' install.
-if (-f "plib/AutoCons/AC.pm") {
-  use lib 'plib';
-}
 use AutoCons::AC;
 
 =pod

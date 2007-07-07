@@ -15,17 +15,23 @@ cons-2.2.0/RELEASE
 cons-2.2.0/TODO
 Construct.PL
 examples/cprog-1/.consign
+examples/cprog-1/Config.h
 examples/cprog-1/Config.h.PL
 examples/cprog-1/Construct.PL
+examples/cprog-1/log
 examples/cprog-1/README
 examples/cprog-1/src/bin/.consign
 examples/cprog-1/src/bin/cprog.c
-examples/Perl::Module/.consign
-examples/Perl::Module/Construct.PL
-examples/Perl::Module/plib/Perl/.consign
-examples/Perl::Module/plib/Perl/Module.pm
-examples/Perl::Module/plib/Perl/Module2.pm
-examples/Perl::Module/README
+examples/cprog-1/src/bin/cprog.o
+examples/Perl-Module/.consign
+examples/Perl-Module/Construct.PL
+examples/Perl-Module/log
+examples/Perl-Module/plib/Perl/.consign
+examples/Perl-Module/plib/Perl/Module.pm
+examples/Perl-Module/plib/Perl/Module2.pm
+examples/Perl-Module/README
+examples/Perl-Module/t/.consign
+examples/Perl-Module/t/01foo.t
 INSTALL
 Makefile.PL
 MANIFEST			This list of files
@@ -43,4 +49,5 @@ README
 t/.consign
 t/01cons.t
 t/02load.t
+t/03examples.t
 t/test.cs

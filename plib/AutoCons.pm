@@ -59,9 +59,6 @@ use strict;
 no strict "vars";
 
 # In case we are under a 'boxed' install.
-if (-f "plib/AutoCons/AC.pm") {
-  use lib 'plib';
-}
 use AutoCons::AC;
 
 # Main subroutine used to create a Construct.
@@ -90,13 +87,15 @@ of the other subs needed to create a working Construct of Conscript.
 sub WriteCS {
   # Get arguments.
   %Args   = @_;
-  $cs     = $Args{ File } if ($Args{ File });
-  $name   = $Args{ Name } if ($Args{ Name });
-  $ver    = $Args{ Version } if ($Args{ Version });
-  $add    = $Args{ Add } if ($Args{ Add });
-  $type   = $Args{ Type } if ($Args{ Type });
-  $norec  = $Args{ NoRec } if ($Args{ NoRec });
+  $cs     = $Args{ File }       if ($Args{ File });
+  $name   = $Args{ Name }       if ($Args{ Name });
+  $ver    = $Args{ Version }    if ($Args{ Version });
+  $add    = $Args{ Add }        if ($Args{ Add });
+  $type   = $Args{ Type }       if ($Args{ Type });
+  $norec  = $Args{ NoRec }      if ($Args{ NoRec });
   @prereq = @{$Args{ PreReqs }} if ($Args{ PreReqs });
+  $libs   = $Args{ Libs }       if ($Args{ Libs });
+  $libs   = ''                  unless ($libs);
   # Defaults.
   $cs   = "Construct" unless ($cs);
   $type = "site" unless ($type);
@@ -281,6 +280,7 @@ sub Vars {
   print CS "\$installarch = \"$installarch\";\n";
   print CS "\$installman1 = \"$installman1\";\n";
   print CS "\$installman3 = \"$installman3\";\n";
+  print CS "\$libs        = \"$libs\";\n";
   foreach (@ARGV) {  
     if (/(.+)\=(.*)/) {
       print CS "\$$1 = $2;\n";
@@ -295,6 +295,7 @@ sub Vars {
   AR            => \'$Config{ar}\',
   LD            => \'$Config{ld}\',
   LDFLAGS       => \'$Config{ldflags}\',
+  LIBS          => \'$libs\',
   ENV           => { \%ENV },\n";
   # Ranlib is a bit weird, since it might be ":" if Ar can do the job.
   print CS
@@ -457,7 +458,30 @@ sub PLibTargs {
     $instfile =~ s/plib\///;
     print CS "InstallAs \$env \"\$installlib/$instfile\", \"blib/$file\";\n";
     push @ppods,"$file";
+    open(FILE, "$file");
+    while (<FILE>) {
+      if ($_ =~ /^use Inline/) {
+        my $inl = $file;
+        $inl =~ s/\.pm/\.inl/;
+        $inl =~ s/plib\///;
+        my $moname = $file;
+        $moname =~ s/\//::/g;
+        $moname =~ s/plib:://;
+        $moname =~ s/\.pm//;
+        print CS "Command \$env \"blib/inl/$inl\", \"blib/$file\", \"$^X -Mlib=blib/plib -MInline=_INSTALL_ -M$moname -e1 $ver blib/inl\";\n";
+      }
+    }
   }
+  print CS <<"  END"
+# Install precompiled Inline.
+DirSearch(\"blib/arch\");
+foreach (\@dirs)  {DirSearch(\"\$_\");}
+foreach (\@files) {
+  my \$file = \$_;
+  \$file =~ s/blib\\/arch//;
+  InstallAs \$env \"\$installarch/\$file\", \"\$_\";
+}
+  END
 }
   
 =pod

@@ -2,3 +2,6 @@ Cprog 1
 
 An example C program that uses AutoCons. You may notice that it doesn't 
 require any Perl code except for PL files.
+
+If your system doesn't have gtk with headers (gtk+-devel on my system), you can use 
+another library.
