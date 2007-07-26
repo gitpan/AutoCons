@@ -1,9 +1,11 @@
 Common.pm:f579d76c5cb6ad6ea87bd845e9ec12fb
-.AC.pm.swp:cd102780387aab3e526210115ec5f19e
 AC.pm~:d8d5eaf4194afdda421a188b85e13eb0
+.AC.pm.swp:cd102780387aab3e526210115ec5f19e
 Settings.pm:d03e9444a36ea5e4a48c475ca4c2fee1
 Tutorial.pod:fccc4cf53650e2a7ffc41828daafde63
 ConfigH.pm:3572adc214f5f9d06c75f6a09c677c7b
-AC.pm:5a07fa174e452a2affdcd73b6a3afb50
+Lang.pm.PL:95226d8dd3f3974649545b5c66bb8643
+AC.pm:33beb281801848265425f8ea068d31ac
+Lang.pm:918625321fa42ef594aad3551d591cea
 HOWTO.pod:d4e5851b3da0d5f6ae682905ad23a874
 Tutorial:0a866d791614963eaf9d7d5c0819b134

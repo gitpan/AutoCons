@@ -28,10 +28,15 @@ unless ($cons) {
   }
 }
 
+# Write plib/AutoCons/Lang.pm.
+chdir "plib/AutoCons";
+do("Lang.pm.PL");
+chdir "../..";
+
 use Module::Build;
 my $build = Module::Build->new(
   module_name => 'AutoCons',
-  dist_version => 0.01_06,
+  dist_version => 0.02_01,
   dist_abstract => "a cons-based build system",
   dist_author => "Michael Howell <m_howell123\@yahoo.com>",
   license  => 'perl',

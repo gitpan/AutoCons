@@ -1,0 +1,83 @@
+=head1 NAME
+
+AutoCons::HOWTO::Lang - HOWTO write an AutoCons language plugin (AutoCons::Lang::*)
+
+=head1 DESCRIPTION
+
+AutoCons is a cons Construct generator similar to ExtUtils::MakeMaker or
+Gnu Autoconf, except that cons is far more portable than make. For the
+developer, this means that your program will build on any system that cons
+will. For a user, this means that you don't need a "make" program to build
+your program.
+
+This HOWTO describes how to write a language plugin for AutoCons.
+
+=head1 INSTALL
+
+Modules are installed with a simple group of commands.
+
+ perl Construct.PL
+ cons
+ cons -- test
+ cons -- install
+
+=head1 HOWTO
+
+=head2 Intro
+
+The API used for AutoCons language plugins is fairly easy-to-learn and straightforward. It is based on arrays and functions. For a typical example, see the Perl plugin.
+
+=head2 Template
+
+An AutoCons plugin is simply a Perl module. For those of you who don't know what a Perl module is, how to write Perl, or who don't even know what Perl is, you'll need to know those before you can continue. Don't worry, I'll wait.
+
+Ok, we can continue.
+
+ # A simple AutoCons plugin.
+
+ push @Args,  "FooArgs";
+ push @Vars,  "FooVars";
+ push @Targs, "FooTargs";
+
+ sub FooArgs {}
+ sub FooVars {}
+ sub FooTargs {}
+
+It is not required that you line the "push"es up. It is just easier to read that way.
+
+=head2 Getting arguments
+
+To recive arguments passed to WriteCS, you use a subroutine that will be called with the same arguments as WriteCS. Adding substance to &FooArgs:
+ use vars qw($foo);
+ sub FooArgs {
+   my %Args = @_;
+   $foo = $Args{ Foo } if ($Args{ PreReqPMs });
+ }
+
+When the "user" (whoever writes a Construct.PL) runs WriteCS, WriteCS calls all of the subroutines in @Args with the arguments it was called with. IE: if The user writes WriteCS(Name => "Foo", Version => "Bar") WriteCS will run FooArgs(Name => "Foo", Version => "Bar").
+
+=head2 Adding Variables
+
+This is very similar to getting variables, only the purpose and order is changed. Add the name of a subroutine to the @Vars array, and set up the sub to add some variables to the Construct, using the &Var sub. For example:
+ sub FooVars {
+   # Remember, Variables are set after arguments are processed.
+   Var("foo", "$foo");
+ }
+
+These variables can be used later in the next step.
+
+The syntax is: Var("var", "val").
+
+=head2 Adding Targets
+
+This is almost identical to the last step, but the subroutines listed in @Targs are run after the ones in @Vars, and are used to define targets using the &Targ sub. For Example:
+ sub FooTargs {
+   Targ("Command", "Foo", "Bar", '$foo');
+   Targ("Cp", "Bar", "Smag");
+ }
+
+The syntax is: Targ("target type", "file to make", "make it from", "optional arg").
+
+=head1 SEE ALSO
+
+L<AutoCons(3)> L<cons(1)> L<perl(1)>

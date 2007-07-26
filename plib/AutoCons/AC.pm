@@ -30,7 +30,7 @@ use File::Find;
 if (eval "require YAML") { require YAML; }
 no strict "vars";
 
-$VERSION = 0.01_06;
+$VERSION = 0.02_01;
 $XS_VERSION = $VERSION;
 
 # List files if a directory.

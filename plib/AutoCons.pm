@@ -48,7 +48,7 @@ require Exporter;
 @ISA = (Exporter);
 @EXPORT = qw(WriteCS Dep Targ);
 
-use vars qw($VERSION $installbin $installlib $installarch $installman1 $installman3);
+use vars qw($VERSION $installbin $installplib $installparch $installman1 $installman3);
 
 # Load everything.
 use Config;
@@ -57,9 +57,8 @@ use Config;
 # is in here.
 use strict;
 no strict "vars";
-
-# In case we are under a 'boxed' install.
 use AutoCons::AC;
+use AutoCons::Lang::Perl;
 
 # Main subroutine used to create a Construct.
 
@@ -73,53 +72,55 @@ of the other subs needed to create a working Construct of Conscript.
    File => "<FILENAME>", # Optional; defaults to 'Construct'
    Name => "<NAME>", # Required
    Version => "<VERSION>", # Required
-   Type =< "<'site' or 'vendor' or 'perl'>", # Optional; defaults to 'site'
    NoRec => <NO RECURSIVE BUILD>, # Optional
-   PreReqs => [ # Optional.
-     <MOD>,
-     ...
-   ],
+   Type =< "<'site' or 'vendor' or 'perl'>", # Optional; defaults to 'site'
+   Libs => "<LIB1 LIB2 LIB3...>",
    Add => "<CODE TO APPEND>" # Optional 
  );
+
+To capture the auguments, add a subroutine to the @Args array. The arguments passed to the &WriteCS subroutine will be passed to yours.
+ push @Args, "FooArgs";
+ sub FooArgs {
+   my %Args = @_;
+   $foo     = $Args{ Foo } if ($Args{ Foo });
+   $bar     = $Args{ Bar } if ($Args{ Bar });
+ }
 
 =cut
 
 sub WriteCS {
   # Get arguments.
   %Args   = @_;
-  $cs     = $Args{ File }       if ($Args{ File });
-  $name   = $Args{ Name }       if ($Args{ Name });
-  $ver    = $Args{ Version }    if ($Args{ Version });
-  $add    = $Args{ Add }        if ($Args{ Add });
-  $type   = $Args{ Type }       if ($Args{ Type });
-  $norec  = $Args{ NoRec }      if ($Args{ NoRec });
-  @prereq = @{$Args{ PreReqs }} if ($Args{ PreReqs });
-  $libs   = $Args{ Libs }       if ($Args{ Libs });
-  $libs   = ''                  unless ($libs);
+  $cs     = $Args{ File }         if ($Args{ File });
+  $name   = $Args{ Name }         if ($Args{ Name });
+  $ver    = $Args{ Version }      if ($Args{ Version });
+  $add    = $Args{ Add }          if ($Args{ Add });
+  $norec  = $Args{ NoRec }        if ($Args{ NoRec });
+  $libs   = $Args{ Libs }         if ($Args{ Libs });
+  $libs   = ''                    unless ($libs);
+  $type   = $Args{ Type }         if ($Args{ Type });
   # Defaults.
   $cs   = "Construct" unless ($cs);
-  $type = "site" unless ($type);
   # How to handle type.
+  $type = "site" unless ($type);
   if ($type eq "site") {
     $installbin  = $Config{ installsitebin };
-    $installlib  = $Config{ installsitelib };
-    $installarch = $Config{ installsitearch };
     $installman1 = $Config{ installsiteman1dir };
     $installman3 = $Config{ installsiteman3dir };
   } elsif ($type eq "vendor") {
     $installbin  = $Config{ installvendorbin };
-    $installlib  = $Config{ installvendorlib };
-    $installarch = $Config{ installvendorarch };
     $installman1 = $Config{ installvendorman1dir };
     $installman3 = $Config{ installvendorman3dir };
   } else {
     $installbin  = $Config{ installbin };
-    $installlib  = $Config{ installlib };              
-    $installarch = $Config{ installarchlib };               
-    $installman1 = $Config{ installman1dir };                  
-    $installman3 = $Config{ installman3dir }; 
+    $installman1 = $Config{ installman1dir };
+    $installman3 = $Config{ installman3dir };
   }
   $installprefix = $Config{ installprefix };
+  # Argument subroutines.
+  foreach (@Args) {
+    eval("&$_(%Args); &DirCleanUp");
+  }
   # Get command line.
   foreach (@ARGV) {
     if (/(.+)\=(.*)/) {
@@ -172,6 +173,22 @@ sub Targ {
   } else {
     print CS "$targ \$env \"$out\", \"$in\";\n";
   }
+}
+
+# Add a variable.
+
+=pod
+
+* Var()
+
+Add a variable.
+ Var("<VAR>", "<VAL>");
+
+=cut
+
+sub Var {
+  my($var,$val) = @_;
+  print CS "\$$var = \"$val\";\n";
 }
 
 # Add a dependency.
@@ -236,18 +253,6 @@ sub SanityCheck {
   if (! $ver) {
     die "Please specify version.\n  Error";
   }
-  if (@prereq) {
-    foreach my $mod (@prereq) {
-      if ($mod =~ /(.+) (.+)/) {
-	eval("use $1 $2");
-      } else {
-        eval("use $mod");
-      }
-      if ($@) {
-        warn sprintf "Warning: prerequisite $mod not found.\n";
-      }
-    }
-  }
   if (-f "MANIFEST") {
     use ExtUtils::Manifest qw(manicheck);
     &manicheck;
@@ -268,24 +273,26 @@ Add variables to Conscript (run by WriteCS, mainly for internal use.)
 sub Vars {
   # Load cons. What worked for Perl itself must work.
   # Might as well be ready in case this is multi-level build.
-  print CS "Export qw( env name ver installbin installlib installarch installman1 installman3);\n";
+  print CS "Export qw( env name ver installbin installplib installparch installman1 installman3);\n";
   # Use current plibs, if we have them.
   print CS "use lib \'./plib\';\n" if (-d "plib");
   print CS "use lib \'./.AutoCons\';\n" if (-d ".AutoCons");
   # Variables.
-  print CS "\$name = \"$name\";\n";
-  print CS "\$ver  = \"$ver\";\n";
-  print CS "\$installbin  = \"$installbin\";\n";
-  print CS "\$installlib  = \"$installlib\";\n";
-  print CS "\$installarch = \"$installarch\";\n";
-  print CS "\$installman1 = \"$installman1\";\n";
-  print CS "\$installman3 = \"$installman3\";\n";
-  print CS "\$libs        = \"$libs\";\n";
+  Var("name", "$name");
+  Var("ver", "$ver");
+  Var("installbin", "$installbin");
+  Var("installman1", "$installman1");
+  Var("installman3", "$installman3");
+  Var("libs", "$libs");
   foreach (@ARGV) {  
     if (/(.+)\=(.*)/) {
-      print CS "\$$1 = $2;\n";
+      Var("$1", "$2");
     }
   }  
+  # Variable subroutines.
+  foreach (@Vars) {
+    eval("&$_; &DirCleanUp");
+  }
   # Load AC.
   print CS "use AutoCons::AC;\n";
   # Construction environment.
@@ -295,7 +302,7 @@ sub Vars {
   AR            => \'$Config{ar}\',
   LD            => \'$Config{ld}\',
   LDFLAGS       => \'$Config{ldflags}\',
-  LIBS          => \'$libs\',
+  LIBS          => \'\$libs\',
   ENV           => { \%ENV },\n";
   # Ranlib is a bit weird, since it might be ":" if Ar can do the job.
   print CS
@@ -306,8 +313,8 @@ sub Vars {
   print CS "  Default qw(\n";
   print CS <<END;
     $installbin
-    $installlib
-    $installarch
+    $installplib
+    $installparch
     $installman1
     $installman3
     $installprefix);
@@ -342,6 +349,12 @@ END
 Add targets to Conscript (run by WriteCS, mainly for internal use.)
  Targs( );
 
+To add subroutines to generate targets, add the name of the subroutine to the @Targs array. for example:
+ push @Targs, "FooTargs";
+ sub FooTargs {
+   Targ("Cp", "Foo", "Bar");
+ }
+
 =cut
 
 sub Targs {
@@ -354,34 +367,15 @@ sub Targs {
   }
   print CS "\";\n";
   &DirCleanUp;
-  if (-d "plib") {
-    print CS "# XS targets.\n";
-    &XSTargs;
-    print CS "# Library targets.\n";
-    &PLibTargs;
+  # Built-ins.
+  push @Targs, "BinTargs", "DocTargs", "TestTargs";
+  # Run them.
+  foreach (@Targs) {
+    eval("&$_; &DirCleanUp");
   }
-  &DirCleanUp;
-  if (-d "bin") {
-    print CS "# Program targets.\n";
-    &BinTargs;
-  }
-  &DirCleanUp;
-  if (-d "pscripts") {  
-    print CS "# Script targets.\n";
-    &PScriptTargs;
-  }
-  &DirCleanUp;
-  print CS "# Documentation targets.\n";
-  &DocTargs;
-  &DirCleanUp;
   # Dist targets.
-  print CS "# Distribution packaging.\n";
   print CS "Command \$env \"dist/\$name-\$ver.tar.gz\", \"$cs\", \'[perl] MkDist()\'
   unless (-f \"dist/\$name-\$ver.tar.gz\");\n";
-  # Test targets.
-  if (-d "t") {
-    &TestTargs();
-  }
   if (-f "Config.h") {
     open (CH, "Config.h");
     my $l1 = <CH>;
@@ -389,35 +383,6 @@ sub Targs {
       print CS "# Regenerate Config.h.\n";
       Targ("Command", "Config.h", "$1", "$^X $1");
     }
-  }
-}
-
-=pod
-
-* XSTargs()
-
-Add targets for testing.
- TestTargs( )
-
-=cut
-
-sub XSTargs {
-  &DirSearch("plib");
-  foreach (@dirs) {
-    &DirSearch("$_");
-  }
-  foreach my $file (@files) {
-    next if ($file =~ /\.consign$/);
-    next if ($file !~ /\.xs/);
-    my $cfile = $file;
-    $cfile =~ s/\.xs/.c/;
-    my $ofile = $file;
-    $ofile =~ s/\.xs/$Config{_o}/;
-    print CS "Command \$env \"blib/$cfile\", \"$file\", \"xsubpp $file >blib/$cfile\";\n";
-    print CS "Objects \$env \"blib/$cfile\";\n";
-    my $instfile = $ofile;
-    $instfile =~ s/plib\///;
-    print CS "InstallAs \$env \"\$installarch/$instfile\", \"blib/$ofile\";\n";
   }
 }
 
@@ -433,57 +398,9 @@ Add targets for testing.
 sub TestTargs {
   print CS "# Test targets.\n";
   my @ts = <t/*.t>;
-  print CS "Command \$env \"t/.tested\", qw(@ts), \"@ [perl] require Test::Harness;Test::Harness::runtests(<t/*.t>)\n  @ touch t/.tested\"\n";
+  print CS "Command \$env \"t/.tested\", qw(@ts), \"@ [perl] require Test::Harness;Test::Harness::runtests(<t/*.t>)\n  @ touch t/.tested\";\n";
 }
 
-=pod
-
-* PLibTargs()
-
-Add perl module targets to Conscript (run by WriteCS, mainly for internal use.)
- PLibTargs( );
-
-=cut
-
-sub PLibTargs {
-  &DirSearch("plib");
-  foreach (@dirs) {
-    &DirSearch("$_");
-  }
-  foreach my $file (@files) {
-    next if ($file =~ /\.consign$/);
-    next if ($file !~ /\.pm/);
-    print CS "Cp \$env \"blib/$file\", \"$file\";\n";
-    my $instfile = $file;
-    $instfile =~ s/plib\///;
-    print CS "InstallAs \$env \"\$installlib/$instfile\", \"blib/$file\";\n";
-    push @ppods,"$file";
-    open(FILE, "$file");
-    while (<FILE>) {
-      if ($_ =~ /^use Inline/) {
-        my $inl = $file;
-        $inl =~ s/\.pm/\.inl/;
-        $inl =~ s/plib\///;
-        my $moname = $file;
-        $moname =~ s/\//::/g;
-        $moname =~ s/plib:://;
-        $moname =~ s/\.pm//;
-        print CS "Command \$env \"blib/inl/$inl\", \"blib/$file\", \"$^X -Mlib=blib/plib -MInline=_INSTALL_ -M$moname -e1 $ver blib/inl\";\n";
-      }
-    }
-  }
-  print CS <<"  END"
-# Install precompiled Inline.
-DirSearch(\"blib/arch\");
-foreach (\@dirs)  {DirSearch(\"\$_\");}
-foreach (\@files) {
-  my \$file = \$_;
-  \$file =~ s/blib\\/arch//;
-  InstallAs \$env \"\$installarch/\$file\", \"\$_\";
-}
-  END
-}
-  
 =pod
 
 * BinTargs()
@@ -507,30 +424,6 @@ sub BinTargs {
     push @ppods,"$file";
   }
 }
-=pod
-
-* PScriptTargs()
-
-Add perl script targets to Conscript (run by WriteCS, mainly for internal use.)
- ScriptTargs( );
-
-=cut
-
-sub PScriptTargs {
-  &DirSearch("pscripts");
-  foreach (@dirs) {
-    &DirSearch("$_");
-  }
-  foreach my $file (@files) {
-    next if ($file =~ /\.consign$/);
-    print CS "Cp \$env \"blib/$file\", \"$file\";\n";
-    my $instfile = $file;
-    $instfile =~ s/pscripts\///;
-    print CS "InstallAs \$env \"\$installbin/$instfile\", \"blib/$file\";\n";
-    push @ppods,"$file";
-  }
-}
-
 
 =pod
 

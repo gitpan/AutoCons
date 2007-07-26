@@ -1,3 +1,0 @@
-cp plib/Perl/Module2.pm blib/plib/Perl/Module2.pm
-pod2man --name=PERL::MODULE2 blib/plib/Perl/Module2.pm blib/man3pm/Perl::Module2.3pm
-cp plib/Perl/Module.pm blib/plib/Perl/Module.pm

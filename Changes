@@ -1,3 +1,8 @@
+-- AutoCons 0.02_01
+  * An API to add support for new languages (plugins). 
+    - See AutoCons::HOWTO::Lang.
+  * Removed Perl-specific code from AutoCons.pm using the new API.
+  * Very, very large amount of code cleanup.
 -- AutoCons 0.01_06
   * Inline support.
   * XS now works.

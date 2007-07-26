@@ -32,12 +32,17 @@ unless ($cons) {
   }
 }
 
+# Write plib/AutoCons/Lang.pm.
+chdir "plib/AutoCons";
+do("Lang.pm.PL");
+chdir "../..";
+
 # Write Construct.PL.
 WriteCS(
   Name => "AutoCons",
-  Version => "0.01_06",
+  Version => "0.02_01",
   NoRec => 1, # Don't build examples.
-  PreReqs => [
+  PreReqPMs => [
     "strict",
     "Config",
     "Test::Harness 2",
@@ -45,3 +50,4 @@ WriteCS(
     "File::Find"
   ]
 );
+
